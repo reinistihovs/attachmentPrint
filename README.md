@@ -1,2 +1,2 @@
 # attachmentPrint
-Programm to automatically print or save attachements from IMAP mailbox.
+Program to automatically print or save attachements from IMAP mailbox.
