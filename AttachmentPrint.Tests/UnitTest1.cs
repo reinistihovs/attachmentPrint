@@ -5,7 +5,7 @@ namespace attachmentPrint.Tests
 {
     public class TestImapConnection
     {
-        private readonly getAttachments2 _getattachments2 = new getAttachments2();
+        private readonly getAttachments _getattachments2 = new getAttachments();
         [Theory]
         [InlineData(true, "imap.gmail.com")]
 

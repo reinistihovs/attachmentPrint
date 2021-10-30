@@ -2,105 +2,124 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ImapX;
-
 
 namespace attachmentPrint
 {
-    class getAttachments
+    
+    public class getAttachments
     {
+        DumpClass Dump = new DumpClass();
 
-        public void DownloadAllAttachments()
+        public bool checkConnection(string srv)
         {
+            var client = new ImapClient(srv, true);
+            
+            if (!client.Connect())
+            {
+                return false;
+            } else
+            {
+                return true;
+            }
+        }
+
+        public void downloadAllUnseenAttchments()
+        {
+
+            Dict Dic = new Dict();
             var appConfiguration = new appConfiguration();
 
-            using (var client = new ImapClient($"{appConfiguration.Host}, {appConfiguration.Port}, {appConfiguration.UseSsl}, {appConfiguration.ValidSsl}", true))
+            var server = appConfiguration.Host;
+            var login = appConfiguration.Username;
+            var password = appConfiguration.Password;
+
+            var attachmentsPath = appConfiguration.TempDir;
+            var inboxFolderName = appConfiguration.ImapFoler;
+            var processedFolderName = appConfiguration.ProcessedFoler;
+
+            var processedMessages = new List<Message>();
+
+            var client = new ImapClient(appConfiguration.Host, true);
+
+            if (!client.Connect())
             {
-                if (!client.Connect( /* optional, use parameters here */) || !client.Login(appConfiguration.Username, appConfiguration.Password))
-                {
-                    Console.WriteLine("access to IMAP denied");
+                Dump.dumpToScreen($"{LogLevel.Fail} {Dic.Msgs["cantconnectserver"]}");
+                Dump.dumpToLog($"{LogLevel.Fail} {Dic.Msgs["cantconnectserver"]}");
+                
+                return; // exits programm
+            }
 
-                    return;
-                }
+            if (!client.Login(login, password))
+            {
+                Dump.dumpToScreen($"{LogLevel.Fail} {Dic.Msgs["cantlogin"]}");
+                Dump.dumpToLog($"{LogLevel.Fail} {Dic.Msgs["cantlogin"]}");
+                return; // exits programm
+            }
 
-                string path = string.Intern(Path.Combine(appConfiguration.TempDir, appConfiguration.Username));
-                if (!Directory.Exists(path))
-                {
-                    Directory.CreateDirectory(path);
-                }
+            var inboxFolder = client.Folders.FirstOrDefault(f => f.Name == inboxFolderName);
+            if (inboxFolder == null)
+            {
+                Dump.dumpToScreen($"{LogLevel.Fail} {Dic.Msgs["noinbox"]}");
+                return; // exits programm
+            }
 
-                foreach (Folder myfolder in client.Folders)
+            inboxFolder.Messages.Download();
+
+            if (inboxFolder.Messages.Any())
+            {
+                foreach (var message in inboxFolder.Messages)
                 {
-                    foreach (var message in myfolder.Search())
+                    Dump.dumpToScreen($"{LogLevel.Info}: {Dic.Msgs["procmsg"]}... UID: {message.UId}, FROM: {message.From}, TO: {String.Join(", ", message.To.Select(t => t.Address))}, SUBJECT: {message.Subject}");
+
+                    message.Seen = true;
+
+                    if (message.Attachments != null && message.Attachments.Any())
                     {
                         foreach (var attachment in message.Attachments)
                         {
                             attachment.Download();
-                            attachment.Save(path);
+
+                            var fileName = String.Format("{0}-{2}{1}", Path.GetFileNameWithoutExtension(attachment.FileName), Path.GetExtension(attachment.FileName), Guid.NewGuid());
+
+                            attachment.Save(attachmentsPath, fileName);
+                            Dump.dumpToScreen($"{LogLevel.Info}: {Dic.Msgs["attsave"]}: {fileName}");
                         }
                     }
+                    else
+                    {                     
+                        Dump.dumpToScreen($"{LogLevel.Info} {Dic.Msgs["nonewmsg"]}");
+
+                    }
+
+                    processedMessages.Add(message);
+
                 }
             }
-        }
-
-        public void DownloadUnreadAttachments()
-        {
-            var appConfiguration = new appConfiguration();
-
-            using (var client = new ImapClient($"{appConfiguration.Host}", true))
+            else
             {
-                if (!client.Connect( /* optional, use parameters here */) || !client.Login(appConfiguration.Username, appConfiguration.Password))
-                    return;
-
-                string path = string.Intern(Path.Combine(appConfiguration.TempDir, appConfiguration.Username));
-                if (!Directory.Exists(path))
-                {
-                    Directory.CreateDirectory(path);
-                }
-
-                foreach (Folder myfolder in client.Folders)
-                {
-                    foreach (var message in myfolder.Search())
-                    {
-                        foreach (var attachment in message.Attachments)
-                        {
-                            attachment.Download();
-                            attachment.Save(path);
-                        }
-                    }
-                }
+                Dump.dumpToScreen($"{LogLevel.Info}: {Dic.Msgs["nounpromsg"]}");
+                Dump.dumpToLog($"{LogLevel.Info}: {Dic.Msgs["nounpromsg"]}");
             }
-        }
 
-        public void DownloadTodaysAttachments()
-        {
-            var appConfiguration = new appConfiguration();
-
-            using (var client = new ImapClient($"{appConfiguration.Host}", true))
+            if (processedMessages.Any())
             {
-                if (!client.Connect( /* optional, use parameters here */) || !client.Login(appConfiguration.Username, appConfiguration.Password))
-                    return;
+                var processedFolder = client.Folders.FirstOrDefault(f => f.Name == processedFolderName);
 
-                string path = string.Intern(Path.Combine(appConfiguration.TempDir, appConfiguration.Username));
-                if (!Directory.Exists(path))
+                if (processedFolder == null)
                 {
-                    Directory.CreateDirectory(path);
+                    processedFolder = client.Folders.Add(processedFolderName);
                 }
 
-                foreach (Folder myfolder in client.Folders)
+                foreach (var message in processedMessages)
                 {
-                    foreach (var message in myfolder.Search())
-                    {
-                        foreach (var attachment in message.Attachments)
-                        {
-                            attachment.Download();
-                            attachment.Save(path);
-                        }
-                    }
+                    message.MoveTo(processedFolder);
+
+                    Dump.dumpToScreen($"{LogLevel.Info}: {Dic.Msgs["msg"]} {message.UId} {Dic.Msgs["mved"]} {processedFolderName} {Dic.Msgs["folder"]}.");
                 }
             }
         }
+
     }
 }
+

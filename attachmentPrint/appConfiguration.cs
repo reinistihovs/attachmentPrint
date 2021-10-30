@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,9 +18,14 @@ namespace attachmentPrint
         public string Username { get; set; } = "attachementprintcsharp@gmail.com";
         public string Password { get; set; } = "Latvija2021";
         public bool MarkAsRead { get; set; } = true;
-        public string TempDir { get; set; }  = "C:\temp";
+        public string TempDir { get; set; }  = @"C:\temp";
+        public string LogLocation { get; set; } = @"C:\temp\attachmentprint.log";
         public string[] FileTypesToPrint { get; set; } = { "PDF", "pdf", "jpg", "JPEG" };
         public string[] ExcludeFileNames { get; set; } = { "emot", "smile", "SMILE", "Smile", "Emot", "EMOT" };
         public string DefaultPrinter { get; set; } = "Microsoft Print to PDF";
+
+
+
+
     }
 }
