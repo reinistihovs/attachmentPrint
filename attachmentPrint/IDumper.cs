@@ -34,7 +34,7 @@ namespace attachmentPrint
         public void dumpToLog(string text)
         {
             var appConfiguration = new appConfiguration();
-            File.WriteAllText(appConfiguration.LogLocation, (DateTime.Now + "  " + text));
+            File.AppendAllText(appConfiguration.LogLocation, (DateTime.Now + "  " + text));
         }
 
         public void dumpToScreen(string text)
