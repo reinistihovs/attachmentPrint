@@ -31,6 +31,7 @@ namespace attachmentPrint
 
             Console.WriteLine("Please choose action:");
             Console.WriteLine("1)  to download all unseen attachments from INBOX and move messages to Processed folder");
+            Console.WriteLine("2)  to download all unseen attachments from INBOX and mark as read");
 
             //Console.WriteLine("3) Print unregistered attachment and register email ID in database");
             Console.WriteLine("press any other key to EXIT");
@@ -40,6 +41,10 @@ namespace attachmentPrint
             {
                 Dump.ToScreenAndLog($"{LogLevel.Info}: Selecttion: 1 ");
                 getAttachments.downloadAllUnseenAttchments();
+            }
+            else if (Action == 2)
+            {
+                getAttachments.downloadAllUnreadAttchments();
             }
             else
             {

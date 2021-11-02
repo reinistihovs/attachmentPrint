@@ -3,11 +3,13 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
+    <UserSecretsId>43bf1c63-801d-410b-9955-d916d4579509</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="ImapX" Version="2.0.0.18" />
     <PackageReference Include="MailKit" Version="2.15.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="5.0.0" />
   </ItemGroup>
 
 </Project>

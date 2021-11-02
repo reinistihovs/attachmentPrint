@@ -7,10 +7,52 @@ using ImapX;
 
 namespace attachmentPrint
 {
-    
+
     public class getAttachments
     {
         DumpClass Dump = new DumpClass();
+        Dict Dic = new Dict();
+        Array imapConnect(Array i)
+        {
+
+            var appConfiguration = new appConfiguration();
+
+            var server = appConfiguration.Host;
+            var login = appConfiguration.Username;
+            var password = appConfiguration.Password;
+
+            var attachmentsPath = appConfiguration.TempDir;
+            var inboxFolderName = appConfiguration.ImapFoler;
+            var processedFolderName = appConfiguration.ProcessedFoler;
+
+            var processedMessages = new List<Message>();
+
+            var client = new ImapClient(appConfiguration.Host, true);
+            if (!client.Connect())
+            {
+                Dump.ToScreenAndLog($"{LogLevel.Fail} {Dic.Msgs["cantconnectserver"]}");
+
+                return i; // exits programm
+            }
+
+            if (!client.Login(login, password))
+            {
+                Dump.ToScreenAndLog($"{LogLevel.Fail} {Dic.Msgs["cantlogin"]}");
+                return i; // exits programm
+            }
+
+            var inboxFolder = client.Folders.FirstOrDefault(f => f.Name == inboxFolderName);
+            if (inboxFolder == null)
+            {
+                Dump.ToScreenAndLog($"{LogLevel.Fail} {Dic.Msgs["noinbox"]}");
+                return i; // exits programm
+            }
+                        var numberOfMessagesLimit = 100;
+            var messages = inboxFolder.Search("ALL", client.Behavior.MessageFetchMode, numberOfMessagesLimit);
+            i = messages;
+            return i;
+        }
+
 
         public bool checkConnection(string srv)
         {
@@ -25,43 +67,42 @@ namespace attachmentPrint
             }
         }
 
+        private void downloadAttachments()
+        {
+
+        }
+        public void downloadAllUnreadAttchments()
+        {
+            //imapConnect();
+
+
+            foreach (var m in imapConnect) {
+                if (!m.Seen) {
+                    var myattach = m.Attachments.ToList();
+                    myattach.AddRange(m.EmbeddedResources.ToList());
+                    foreach (var r in myattach) {
+                        var fileName = String.Format("{0}-{2}{1}", Path.GetFileNameWithoutExtension(r.FileName), Path.GetExtension(r.FileName), Guid.NewGuid());
+                        r.Download();
+                        r.Save(attachmentsPath, fileName);
+                     }
+                 // foreach (var r in m.EmbeddedResources) {
+                 //   var fileName = String.Format("{0}-{2}{1}", Path.GetFileNameWithoutExtension(r.FileName), Path.GetExtension(r.FileName), Guid.NewGuid());
+//
+  //                  r.Download();
+    //                r.Save(attachmentsPath, fileName);
+      //            }
+
+                }
+//#mark messages as read
+         //    m.Flags.Add("\SEEN")
+ 
+
+            }
+        }
         public void downloadAllUnseenAttchments()
         {
 
-            Dict Dic = new Dict();
-            var appConfiguration = new appConfiguration();
 
-            var server = appConfiguration.Host;
-            var login = appConfiguration.Username;
-            var password = appConfiguration.Password;
-
-            var attachmentsPath = appConfiguration.TempDir;
-            var inboxFolderName = appConfiguration.ImapFoler;
-            var processedFolderName = appConfiguration.ProcessedFoler;
-
-            var processedMessages = new List<Message>();
-
-            var client = new ImapClient(appConfiguration.Host, true);
-
-            if (!client.Connect())
-            {
-                Dump.ToScreenAndLog($"{LogLevel.Fail} {Dic.Msgs["cantconnectserver"]}");
-                
-                return; // exits programm
-            }
-
-            if (!client.Login(login, password))
-            {
-                Dump.ToScreenAndLog($"{LogLevel.Fail} {Dic.Msgs["cantlogin"]}");
-                return; // exits programm
-            }
-
-            var inboxFolder = client.Folders.FirstOrDefault(f => f.Name == inboxFolderName);
-            if (inboxFolder == null)
-            {
-                Dump.ToScreenAndLog($"{LogLevel.Fail} {Dic.Msgs["noinbox"]}");
-                return; // exits programm
-            }
 
             inboxFolder.Messages.Download();
 
