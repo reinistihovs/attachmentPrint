@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using ImapX;
@@ -44,23 +45,21 @@ namespace attachmentPrint
 
             if (!client.Connect())
             {
-                Dump.dumpToScreen($"{LogLevel.Fail} {Dic.Msgs["cantconnectserver"]}");
-                Dump.dumpToLog($"{LogLevel.Fail} {Dic.Msgs["cantconnectserver"]}");
+                Dump.ToScreenAndLog($"{LogLevel.Fail} {Dic.Msgs["cantconnectserver"]}");
                 
                 return; // exits programm
             }
 
             if (!client.Login(login, password))
             {
-                Dump.dumpToScreen($"{LogLevel.Fail} {Dic.Msgs["cantlogin"]}");
-                Dump.dumpToLog($"{LogLevel.Fail} {Dic.Msgs["cantlogin"]}");
+                Dump.ToScreenAndLog($"{LogLevel.Fail} {Dic.Msgs["cantlogin"]}");
                 return; // exits programm
             }
 
             var inboxFolder = client.Folders.FirstOrDefault(f => f.Name == inboxFolderName);
             if (inboxFolder == null)
             {
-                Dump.dumpToScreen($"{LogLevel.Fail} {Dic.Msgs["noinbox"]}");
+                Dump.ToScreenAndLog($"{LogLevel.Fail} {Dic.Msgs["noinbox"]}");
                 return; // exits programm
             }
 
@@ -70,7 +69,7 @@ namespace attachmentPrint
             {
                 foreach (var message in inboxFolder.Messages)
                 {
-                    Dump.dumpToScreen($"{LogLevel.Info}: {Dic.Msgs["procmsg"]}... UID: {message.UId}, FROM: {message.From}, TO: {String.Join(", ", message.To.Select(t => t.Address))}, SUBJECT: {message.Subject}");
+                    Dump.ToScreenAndLog($"{LogLevel.Info}: {Dic.Msgs["procmsg"]}... UID: {message.UId}, FROM: {message.From}, TO: {String.Join(", ", message.To.Select(t => t.Address))}, SUBJECT: {message.Subject}");
 
                     message.Seen = true;
 
@@ -83,12 +82,14 @@ namespace attachmentPrint
                             var fileName = String.Format("{0}-{2}{1}", Path.GetFileNameWithoutExtension(attachment.FileName), Path.GetExtension(attachment.FileName), Guid.NewGuid());
 
                             attachment.Save(attachmentsPath, fileName);
-                            Dump.dumpToScreen($"{LogLevel.Info}: {Dic.Msgs["attsave"]}: {fileName}");
+                            Process.Start($"LPR -S {appConfiguration.DefaultPrinter} -P raw {attachmentsPath + fileName}");
+                            Dump.ToScreenAndLog($"{LogLevel.Info}: {Dic.Msgs["attsave"]}: {fileName}");
                         }
                     }
                     else
                     {                     
-                        Dump.dumpToScreen($"{LogLevel.Info} {Dic.Msgs["nonewmsg"]}");
+                        Dump.ToScreenAndLog($"{LogLevel.Info} {Dic.Msgs["nonewmsg"]}");
+                        Dump.ToLogOnly($"{LogLevel.Info}: {Dic.Msgs["nonewmsg"]}");
 
                     }
 
@@ -98,8 +99,8 @@ namespace attachmentPrint
             }
             else
             {
-                Dump.dumpToScreen($"{LogLevel.Info}: {Dic.Msgs["nounpromsg"]}");
-                Dump.dumpToLog($"{LogLevel.Info}: {Dic.Msgs["nounpromsg"]}");
+                Dump.ToScreenAndLog($"{LogLevel.Info}: {Dic.Msgs["nounpromsg"]}");
+                Dump.ToLogOnly($"{LogLevel.Info}: {Dic.Msgs["nounpromsg"]}");
             }
 
             if (processedMessages.Any())
@@ -115,7 +116,7 @@ namespace attachmentPrint
                 {
                     message.MoveTo(processedFolder);
 
-                    Dump.dumpToScreen($"{LogLevel.Info}: {Dic.Msgs["msg"]} {message.UId} {Dic.Msgs["mved"]} {processedFolderName} {Dic.Msgs["folder"]}.");
+                    Dump.ToScreenAndLog($"{LogLevel.Info}: {Dic.Msgs["msg"]} {message.UId} {Dic.Msgs["mved"]} {processedFolderName} {Dic.Msgs["folder"]}.");
                 }
             }
         }

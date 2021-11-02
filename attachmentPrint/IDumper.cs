@@ -16,30 +16,31 @@ namespace attachmentPrint
         Error,
         Fail
     }
-    public interface IDumpToLog
+    public interface IToLogOnly
     {
 
-        void dumpToLog(string text);
+        void ToLogOnly(string text);
     }
 
-    public interface IDumpToScreen
+    public interface IToScreenAndLog
     {
-        void dumpToScreen(string text);
+        void ToScreenAndLog(string text);
     }
 
 
-    public class DumpClass : IDumpToLog, IDumpToScreen
+    public class DumpClass : IToLogOnly, IToScreenAndLog
     {
 
-        public void dumpToLog(string text)
+        public void ToLogOnly(string text)
         {
             var appConfiguration = new appConfiguration();
-            File.AppendAllText(appConfiguration.LogLocation, (DateTime.Now + "  " + text));
+            File.AppendAllText(appConfiguration.LogLocation, (DateTime.Now + "  " + text + Environment.NewLine));
         }
 
-        public void dumpToScreen(string text)
+        public void ToScreenAndLog(string text)
         {
             Console.WriteLine(DateTime.Now + "  " + text);
+            ToLogOnly(text);
         }
     }
 

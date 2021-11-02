@@ -1,5 +1,4 @@
 ﻿using System;
-using ImapX;
 
 
 
@@ -11,18 +10,24 @@ namespace attachmentPrint
 
         static void Main(string[] args)
         {
-
+            DumpClass Dump = new DumpClass();
+            Dict Dic = new Dict();
             var appConfiguration = new appConfiguration();
             var getAttachments = new getAttachments();
             Console.WriteLine("Checking internet connection");
             bool isConnected = getAttachments.checkConnection("imap.gmail.com");
             if (!isConnected) {
-                Console.WriteLine("cant connect to gmail, do you have internet?");
+                Dump.ToScreenAndLog($"{LogLevel.Error}: cant connect to gmail, do you have internet?");
                 Console.WriteLine("Press Enter N to Exit... ");
-                while (Console.ReadKey().Key != ConsoleKey.N) {}
+                while (Console.ReadKey().Key != ConsoleKey.N) { }
                 return;
 
-            } else Console.WriteLine("test connection to imap.gmail.com succesfull... ");
+            } else
+            { 
+                Dump.ToScreenAndLog($"{LogLevel.Info}: test connection to imap.gmail.com succesfull... ");
+
+            }
+
 
             Console.WriteLine("Please choose action:");
             Console.WriteLine("1)  to download all unseen attachments from INBOX and move messages to Processed folder");
@@ -33,13 +38,14 @@ namespace attachmentPrint
             int Action = int.Parse(Console.ReadLine());
             if (Action == 1 )
             {
+                Dump.ToScreenAndLog($"{LogLevel.Info}: Selecttion: 1 ");
                 getAttachments.downloadAllUnseenAttchments();
-
             }
             else
             {
-                Console.WriteLine($"Invalid action selected press ENTER to exit");
+                Dump.ToScreenAndLog($"{LogLevel.Warn}: Invalid action selected press ENTER to exit");
                 while (Console.ReadKey().Key != ConsoleKey.Enter) {}
+                return;
             }
             
 
