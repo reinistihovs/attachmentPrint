@@ -45,7 +45,7 @@ namespace attachmentPrint
                 }
                 catch (Exception e)
                 {
-                    Dump.ToScreenAndLog($"{LogLevel.Error} {Dic.Msgs["cantconnectserver"]} Server: {appConfiguration.Host}  SSL_ENABLED: {appConfiguration.UseSsl}  PORT:{appConfiguration.Port}  ");
+                    Dump.ToScreenAndLog($"{LogLevel.Error} {Dic.Msgs["cantconnectserver"]} Server: {appConfiguration.Host}  SSL_ENABLED: {appConfiguration.UseSsl}  PORT:{appConfiguration.Port}  ERROR MSG:{e}");
                     connected = false;
                 }
 
@@ -58,7 +58,7 @@ namespace attachmentPrint
             }
             catch (Exception e)
             {
-                Dump.ToScreenAndLog($"{LogLevel.Error} {Dic.Msgs["cantlogin"]} Server: {appConfiguration.Host}  SSL_ENABLED: {appConfiguration.UseSsl}  PORT:{appConfiguration.Port} Username: {appConfiguration.Username}  ");
+                Dump.ToScreenAndLog($"{LogLevel.Error} {Dic.Msgs["cantlogin"]} Server: {appConfiguration.Host}  SSL_ENABLED: {appConfiguration.UseSsl}  PORT:{appConfiguration.Port} Username: {appConfiguration.Username} ERROR MSG:{e} ");
 
             }
             ImapClient = null;
