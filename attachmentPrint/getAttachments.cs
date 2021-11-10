@@ -10,8 +10,14 @@ namespace attachmentPrint
     
     public class getAttachments
     {
-        DumpClass Dump = new DumpClass();
 
+        static appConfiguration appConfiguration = new appConfiguration();
+        DumpClass Dump = new DumpClass();
+        Dict Dic = new Dict();
+        private string[] client;
+
+
+        //This is only for test demo
         public bool checkConnection(string srv)
         {
             var client = new ImapClient(srv, true);
@@ -25,17 +31,16 @@ namespace attachmentPrint
             }
         }
 
-        public void downloadAllUnseenAttchments()
+        public void getMail()
         {
 
-            Dict Dic = new Dict();
-            var appConfiguration = new appConfiguration();
+            //var appConfiguration = new appConfiguration();
 
             var server = appConfiguration.Host;
             var login = appConfiguration.Username;
             var password = appConfiguration.Password;
 
-            var attachmentsPath = appConfiguration.TempDir;
+            var attachmentsPath = appConfiguration.Dir;
             var inboxFolderName = appConfiguration.ImapFoler;
             var processedFolderName = appConfiguration.ProcessedFoler;
 
