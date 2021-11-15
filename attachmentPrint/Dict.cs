@@ -19,6 +19,18 @@ namespace attachmentPrint
             { "nounpromsg", "No unprocessed messages found." },
             { "msg", "Message" },
             { "mved", "moved to" },
+            { "connectedtoservertryingtologin", "Connected to server trying to login" },
+            { "loginsuccess", "Login successfull" },
+            { "cantgetmessages", "Cant get messages, is mailbox empty?" },
+            { "nooption", "No option was selected, falling back to default function, download from inbox, limited messages." },
+            { "getunseen", "Print all unseen attachments in mailbox." },
+            { "gtnany", "Print all attachments." },
+            { "getunseeninboxlimit", "Print unseen attachments from Inbox, limited count." },
+            { "getinboxany", "Print all from inbox." },
+            { "printingimage", "Printing image." },
+            { "cantprintimage", "Cant print image." },
+            { "printingpdf", "Printing PDF." },
+            { "cantprintpdf", "Cant print PDF." },
             { "folder", "folder" }
         };
     }

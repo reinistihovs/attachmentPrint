@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "attachmentPrint": {
+      "commandName": "Project",
+      "commandLineArgs": "-host \"imap.gmail.com\" -username\"attachementprintcsharp@gmail.com\" -password \"Latvija2021\""
+    }
+  }
+}

@@ -33,7 +33,7 @@ namespace attachmentPrint
 
         public void ToLogOnly(string text)
         {
-            var appConfiguration = new appConfiguration();
+            var appConfiguration = new Options();
             File.AppendAllText(appConfiguration.LogLocation, (DateTime.Now + "  " + text + Environment.NewLine));
         }
 
