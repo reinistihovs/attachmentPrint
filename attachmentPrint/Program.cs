@@ -113,9 +113,10 @@ namespace attachmentPrint
                         // Save and print attached attachments
                         foreach (var attachment in message.Attachments)
                         {
-                            message.Seen = true;
+                            
                             if (Options.FileTypesToPrint.All(attachment.FileName.Contains))
                             {
+                                message.Seen = true;
                                 attachment.Download();
                                 var fileName = String.Format("{0}-{2}{1}", Path.GetFileNameWithoutExtension(attachment.FileName), Path.GetExtension(attachment.FileName), Guid.NewGuid());
                                 attachment.Save(Options.Dir, fileName);
@@ -139,9 +140,10 @@ namespace attachmentPrint
                         // Save and print Inline embedded attachments
                         foreach (var embedded in message.EmbeddedResources)
                         {
-                            message.Seen = true;
+                            
                             if (Options.FileTypesToPrint.Any(embedded.FileName.Contains))
-                            {  
+                            {
+                                message.Seen = true;
                                 embedded.Download();                    
                                 var fileName = String.Format("{0}-{2}{3}{1}", Path.GetFileNameWithoutExtension(embedded.FileName), Path.GetExtension(embedded.FileName), Guid.NewGuid(), "-Embedded");
                                 embedded.Save(Options.Dir, fileName);

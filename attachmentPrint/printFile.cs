@@ -133,7 +133,7 @@ namespace attachmentPrint
                 proc.StartInfo.Arguments = @"C:\WINDOWS\system32\shimgvw.dll,ImageView_PrintTo """ + filename + @""" " + @"""" + printer + @"""";
                 proc.StartInfo.UseShellExecute = true;
                 proc.Start();
-                Thread.Sleep(8000);
+                Thread.Sleep(4000);
                 if (!proc.HasExited)
                 {
                     proc.WaitForExit(4000);
