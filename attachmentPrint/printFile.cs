@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.Win32;
+using PdfiumViewer;
+using System;
 using System.Diagnostics;
 using System.Drawing.Printing;
-using System.Linq;
-using System.Text;
+using System.IO;
 using System.Threading;
-using System.Threading.Tasks;
-using PdfiumViewer;
-using System.Windows;
 
 namespace attachmentPrint
 {
@@ -22,7 +19,7 @@ namespace attachmentPrint
         public abstract bool SendToPrinter(string printer, string paperName, string filename);
     }
 
-    class PdfFile : PrintAttachmentFile
+    class PdfFile_Pdfium : PrintAttachmentFile
     {
         public override bool SendToPrinter(string printer, string paperName, string filename)
         {
@@ -44,8 +41,7 @@ namespace attachmentPrint
                     }
                 }
                 //string uncFilename = "@" + "\"" + filename + "\"";
-                Console.WriteLine($"{@filename}");
-                using (var document = PdfDocument.Load(@"C:\temp\Intelektualas_sist_un_tehnologijas-a6fd3d4d-d151-4f6b-89b0-79b098cd4e02-Embedded.pdf"))
+                using (var document = PdfDocument.Load(filename))
                 {
                     using (var printDocument = document.CreatePrintDocument())
                     {
@@ -65,6 +61,63 @@ namespace attachmentPrint
             }
         }
     }
+    class PdfFile : PrintAttachmentFile
+    {
+        public override bool SendToPrinter(string printer, string paperName, string filename)
+        {
+            Process p = new Process();
+            string uncFilename = "@" + "\"" + filename + "\"";
+            p.StartInfo.Verb = "PrintTo";
+            p.StartInfo.FileName = filename;
+            p.StartInfo.CreateNoWindow = true;
+            p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            p.StartInfo.UseShellExecute = true;
+            p.StartInfo.Arguments = "\"" + printer + "\"";
+            
+
+
+            try
+            {
+                p.Start();
+                Thread.Sleep(5000);
+                p.CancelErrorRead();
+                p.Kill();
+                //File.Delete(uncFilename);
+                return true;
+            }
+            catch (Exception e)
+            {
+                Dump.ToScreenAndLog($"{LogLevel.Error} {Dic.Msgs["cantprintpdf"]} {filename} ERROR MSG:  {e}");
+
+                return false;
+            }
+        }
+    }
+
+    class PdfFileToDefault : PrintAttachmentFile
+    {
+        public override bool SendToPrinter(string printer, string paperName, string filename)
+        {
+            string uncFilename = "@" + "\"" + filename + "\"";
+            try
+            {
+                Process.Start(
+                   Registry.LocalMachine.OpenSubKey(
+                        @"SOFTWARE\Microsoft\Windows\CurrentVersion" +
+                        @"\App Paths\AcroRd32.exe").GetValue("").ToString(),
+                   string.Format("/h /t \"{0}\" \"{1}\"", filename, printer));
+                return true;
+            }
+            catch (Exception e) 
+            { 
+                Dump.ToScreenAndLog($"{LogLevel.Error} {Dic.Msgs["cantprintpdf"]} {filename} ERROR MSG:  {e}"); 
+            }
+            return false;
+        }
+    }
+
+
+
     class PictureFile : PrintAttachmentFile
     {
 
@@ -74,6 +127,7 @@ namespace attachmentPrint
             try
             {
                 Dump.ToScreenAndLog($"{LogLevel.Info} {Dic.Msgs["printingimage"]} {filename} , {printer}");
+                string uncFilename = "@" + "\"" + filename + "\"";
                 Process proc = new Process();
                 proc.StartInfo.FileName = "rundll32.exe";
                 proc.StartInfo.Arguments = @"C:\WINDOWS\system32\shimgvw.dll,ImageView_PrintTo """ + filename + @""" " + @"""" + printer + @"""";
@@ -84,6 +138,7 @@ namespace attachmentPrint
                 {
                     proc.WaitForExit(4000);
                 }
+                //File.Delete(uncFilename);
                 return true;
             }
             catch (Exception e)

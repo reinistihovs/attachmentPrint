@@ -1,11 +1,7 @@
 ﻿using ImapX;
 using ImapX.Enums;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace attachmentPrint
 {
@@ -16,7 +12,7 @@ namespace attachmentPrint
         Dict Dic = new();
 
         private ImapClient ImapClient { get; set; }
-        private ImapClient ConnectImap()
+        public ImapClient ConnectImap()
         {
             ImapClient = null;
             try
@@ -25,7 +21,10 @@ namespace attachmentPrint
                 try
                 {
                     // Configure IMAP client
-                    if (ImapClient == null) ImapClient = new ImapClient(Options.Host, Options.UseSsl);
+                    if (ImapClient == null)
+                    {
+                        ImapClient = new ImapClient(Options.Host, Options.UseSsl);
+                    }
 
                     // Set SSL protocol to 1.2 standart
                     if (Options.UseSsl)
@@ -38,7 +37,9 @@ namespace attachmentPrint
                     }
                     // Connect to IMAP server
                     if (!ImapClient.IsConnected)
+                    {
                         ImapClient.Connect();
+                    }
 
                     // Login to IMAP account
                     if (ImapClient.IsConnected)
@@ -76,6 +77,7 @@ namespace attachmentPrint
 
         public Message[] GetMessages(bool searchLimit, bool unseenOnly, bool searchInAllFolders)
         {
+            Dump.ToScreenAndLog($"{LogLevel.Info}: {Dic.Msgs["plswait"]} ");
             Message[] messages = null;
             ImapClient = ConnectImap();
             try
@@ -121,5 +123,5 @@ namespace attachmentPrint
         }
     }
 }
-   
+
 
