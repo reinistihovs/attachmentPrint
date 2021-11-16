@@ -4,10 +4,10 @@ using ImapX;
 namespace attachmentPrint
 {
     
-    public class testDemo
+    public class TestDemo
     {
         //This is only for test demo
-        public bool checkConnection(string srv)
+        public bool CheckConnection(string srv)
         {
             var client = new ImapClient(srv, true);
             

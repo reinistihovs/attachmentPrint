@@ -9,14 +9,14 @@ using System.Threading.Tasks;
 
 namespace attachmentPrint
 {
-    class email
+    class Email
     {
-        Options Options = new Options();
-        DumpClass Dump = new DumpClass();
-        Dict Dic = new Dict();
+        readonly Options Options = new();
+        DumpClass Dump = new();
+        Dict Dic = new();
 
         private ImapClient ImapClient { get; set; }
-        private ImapClient connectImap()
+        private ImapClient ConnectImap()
         {
             ImapClient = null;
             try
@@ -77,7 +77,7 @@ namespace attachmentPrint
         public Message[] GetMessages(bool searchLimit, bool unseenOnly, bool searchInAllFolders)
         {
             Message[] messages = null;
-            ImapClient = connectImap();
+            ImapClient = ConnectImap();
             try
             {
 
@@ -89,20 +89,20 @@ namespace attachmentPrint
                         messages = inboxFolder.Search("UNSEEN", MessageFetchMode.Full, Options.SearchLimit);
                         Dump.ToScreenAndLog($"{LogLevel.Info}: {Dic.Msgs["getunseeninboxlimit"]}");
                     }
-                    else if (searchInAllFolders && !searchLimit && unseenOnly)
+                    else if (!searchInAllFolders && !searchLimit && !unseenOnly)
                     {
-                        messages = ImapClient.Folders.All.Search("UNSEEN", MessageFetchMode.Full);
-                        Dump.ToScreenAndLog($"{LogLevel.Info}: {Dic.Msgs["getunseen"]}");
+                        messages = inboxFolder.Search("ALL", MessageFetchMode.Full);
+                        Dump.ToScreenAndLog($"{LogLevel.Info}: {Dic.Msgs["getinboxany"]}");
                     }
                     else if (searchInAllFolders && !searchLimit && !unseenOnly)
                     {
                         messages = ImapClient.Folders.All.Search("ALL", MessageFetchMode.Full);
                         Dump.ToScreenAndLog($"{LogLevel.Info}: {Dic.Msgs["getany"]}");
                     }
-                    else if (!searchInAllFolders && searchLimit && !unseenOnly)
+                    else if (searchInAllFolders && !searchLimit && unseenOnly)
                     {
-                        messages = inboxFolder.Search("ALL", MessageFetchMode.Full, Options.SearchLimit);
-                        Dump.ToScreenAndLog($"{LogLevel.Info}: {Dic.Msgs["getinboxany"]}");
+                        messages = inboxFolder.Search("UNSEEN", MessageFetchMode.Full, Options.SearchLimit);
+                        Dump.ToScreenAndLog($"{LogLevel.Info}: {Dic.Msgs["getanyunseen"]}");
                     }
                     else
                     {

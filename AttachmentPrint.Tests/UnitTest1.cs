@@ -5,21 +5,21 @@ namespace attachmentPrint.Tests
 {
     public class TestImapConnection
     {
-        private readonly testDemo _getattachments2 = new testDemo();
+        private readonly TestDemo _getattachments2 = new();
         [Theory]
         [InlineData(true, "imap.gmail.com")]
 
-        public void checkGmailConnectionIsTrue(bool expected, string srv)
+        public void CheckGmailConnectionIsTrue(bool expected, string srv)
         {
-            Assert.Equal(expected, _getattachments2.checkConnection(srv));
+            Assert.Equal(expected, _getattachments2.CheckConnection(srv));
         }
 
         [Theory]
         [InlineData(false, "imap.kakafui.com")]
 
-        public void checkFakeConnectionIsFalse(bool expected, string srv)
+        public void CheckFakeConnectionIsFalse(bool expected, string srv)
         {
-            Assert.Equal(expected, _getattachments2.checkConnection(srv));
+            Assert.Equal(expected, _getattachments2.CheckConnection(srv));
         }
     }
 }

@@ -39,7 +39,7 @@ namespace attachmentPrint
         [Option('e', "exclude", Required = false, HelpText = "what file types to exclude?")]
         public string[] ExcludeFileNames { get; set; } = { "emot", "smile", "SMILE", "Smile", "Emot", "EMOT" };
         [Option('a', "printer", Required = false, HelpText = "Full name of printer.")]
-        public string DefaultPrinter { get; set; } = "Microsoft Print to PDF";
+        public string DefaultPrinter { get; set; } = "PDFCreator";
         [Option('n', "pdfextensions", Required = false, HelpText = "List of PDF extensions to print.")]
         public string[] PdfExtensions { get; set; } = { "PDF", "pdf" };
         [Option('z', "pictureextensions", Required = false, HelpText = "List of picture extensions.")]
